@@ -1,0 +1,165 @@
+---
+title: "Homework 1"
+author: "Samriddh Gupta"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+1. (2 pts) In the second variant of rescale01(), infinite values are left unchanged. Rewrite rescale01() so that -Inf is mapped to 0, and Inf is mapped to 1.  Add error checking to return the message “Error: input must be numeric” if the input is not all numeric.
+```{r}
+rescale01 <- function(x){
+  if(is.numeric(x)==FALSE){
+    stop("Error: input must be numeric")
+  }
+  x=replace(x,x==Inf,1)
+  x=replace(x,x==-Inf,0)
+  rng <- range(x, na.rm = TRUE, finite=F)
+  (x - rng[1]) / (rng[2] - rng[1])
+}
+
+#rescale01(c(0,10,2,"a")) ## gives you the error we want
+rescale01(c(3,4,10,Inf,-Inf))
+rescale01(c(3,4,1,Inf,-Inf))
+
+```
+
+2. Write both_na(), a function that takes two vectors of the same length and returns the number of positions that have an NA in both vectors.
+```{r}
+both_na<- function(x,y){
+  if (length(x) != length(y)) {
+    stop("`x` and `y` must be the same length", call. = FALSE)
+  }
+  which(is.na(x) & is.na(y))
+}
+
+
+both_na(c(1, 2, NA, 2, NA), c(1, 2, 3, 4, NA))
+both_na(c(1, 2, NA, 2, NA), c(1, 2, NA, 4, NA))
+```
+
+3. Read the source code for each of the following three functions, puzzle out what they do, and then brainstorm better names.
+```{r}
+f1 <- function(string, prefix) {
+  substr(string, 1, nchar(prefix)) == prefix
+}
+f2 <- function(x) {
+  if (length(x) <= 1) return(NULL)
+  x[-length(x)]
+}
+f3 <- function(x, y) {
+  rep(y, length.out = length(x))
+}
+
+f1("Mr Samriddh gupta","mr")
+f1("Mr Samriddh gupta","Mr")
+f1("Helloworld","Hello")
+# f1 tells you whether the string is has the first part same as prefix or second string.
+
+
+f2(c(1,2,3,4,5))
+f2(c(1,2,3,4))
+f2("hello")
+#f2 returns the strng with less than 1 last character. If there is only one character, then it returns null.
+
+f3("samriddh12","helloworld")
+f3("samriddh","hello")
+f3("samriddh12","hello")
+
+# f3 replaces the length of the second string with first string.
+
+```
+
+4. Write a greeting function that says “good morning”, “good afternoon”, or “good evening”, depending on the time of day. (Hint: use a time argument that defaults to lubridate::now(). That will make it easier to test your function.
+```{r}
+library(lubridate)
+library(tidyverse)
+greeting <- function(now = now()) {
+  if (between(hour(now), 6, 12)) {# my morning is from 6 to 12
+    print("Good morning")
+  } 
+  else if (between(hour(now), 12, 15)) { # my afternoon is from 12 to 3 pm 
+    print("Good afternoon")
+  } 
+  else if(between(hour(now),15,21)){ # my evening is from 3 pm to 9 pm
+    print("Good evening")
+  }
+  else{
+    print("Good Night") ## my edition to good night
+  }
+}
+greeting(now())
+
+```
+
+5. Implement a fizzbuzz function. It takes a single number as input. If the number is divisible by three, it returns “fizz”. If it’s divisible by five it returns “buzz”. If it’s divisible by three and five, it returns “fizzbuzz”. Otherwise, it returns the number. Make sure you first write working code before you create the function.
+
+```{r}
+fizzbuzz<- function(x){
+  if(x%%3==0){
+    if (x%%5==0){
+      print("fizzbuzz")
+    }
+    else{
+      print("fizz")
+    }
+  }
+  else if (x%%5==0){
+    print("buzz")
+  }
+  else{
+    return(x)
+  }
+}
+
+
+fizzbuzz(21)
+fizzbuzz(85)
+fizzbuzz(45)
+fizzbuzz(76)
+
+```
+
+6.  How could you use cut() to simplify this set of nested if-else statements?
+if (temp <= 0) {
+  "freezing"
+} else if (temp <= 10) {
+  "cold"
+} else if (temp <= 20) {
+  "cool"
+} else if (temp <= 30) {
+  "warm"
+} else {
+  "hot"
+}
+How would you change the call to cut() if I’d used < instead of <=? What is the other chief advantage of cut() for this problem? (Hint: what happens if you have many values in temp?)
+```{r}
+weather<-function(temp){
+  cut(temp, breaks = seq(-10, 40, 10),
+    labels = c("freezing", "cold", "cool", "warm", "hot"))
+}
+
+weather(30)
+weather(-2)
+weather(10)
+```
+
+if we need to use < instead of <= we need to add a liitle change to the code
+
+```{r}
+weather2<- function(temp){
+  cut(temp, breaks = seq(-10, 40, 10),
+    right = FALSE,
+    labels = c("freezing", "cold", "cool", "warm", "hot"))
+}
+weather2(30)
+weather2(-2)
+weather2(10)
+```
+
+the advantages of using cut() is that the code gets shorter and we do need to change at many places if we are changing the deminesions in the future.
+ 
+ 
+## Reference 
+ I took a liitle bit of help from this website
+ https://github.com/cimentadaj/R4DS-Solutions/blob/master/ch15.Rmd
